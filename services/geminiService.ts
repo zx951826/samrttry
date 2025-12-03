@@ -2,7 +2,15 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ShopRecommendation } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Lazy initialization of the AI client
+const getAiClient = () => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    console.error("API Key not found. Please check your environment variables.");
+    throw new Error("API Key 未設定。請在設定中輸入您的 Google API Key。");
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 // Categorization Prompt
 const SYSTEM_INSTRUCTION_ANALYSIS = `
@@ -20,6 +28,7 @@ export const analyzeClothingImage = async (base64Image: string, mimeType: string
   stylingTips: string;
 }> => {
   try {
+    const ai = getAiClient();
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: {
@@ -60,6 +69,7 @@ export const generateTryOn = async (
   clothingImagesBase64: string[]
 ): Promise<{ imageUrl: string | null; advice: string }> => {
   try {
+    const ai = getAiClient();
     const parts: any[] = [
       { inlineData: { mimeType: 'image/jpeg', data: userImageBase64 } }
     ];
@@ -114,6 +124,7 @@ export const recommendShopOutfit = async (
   brands: string[]
 ): Promise<ShopRecommendation> => {
   try {
+    const ai = getAiClient();
     const brandStr = brands.join('、');
     const prompt = `
       分析這張用戶照片的風格、身形和膚色。
@@ -177,6 +188,7 @@ export const generateShopTryOn = async (
   shopItemsDescription: string
 ): Promise<string | null> => {
   try {
+    const ai = getAiClient();
     const prompt = `
       這是使用者的照片。請生成一張他穿著以下服裝的逼真照片：
       ${shopItemsDescription}
