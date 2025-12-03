@@ -1,0 +1,7 @@
+{
+  "name": "SmartLook AI - 智能櫥窗",
+  "description": "A high-tech smart wardrobe application that uses Google Gemini AI to analyze your clothing and suggest outfits.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
